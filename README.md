@@ -30,4 +30,4 @@ To work on an exercise, checkout the corresponding branch:
 git checkout exercise-1
 ```
 
-Each exercise branch contains a `task.md` with detailed instructions.
+Each exercise branch contains a `TASK.md` with detailed instructions.
