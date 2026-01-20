@@ -1,0 +1,32 @@
+# Exercise files (tracked on exercise branches, not main)
+client/
+server/
+
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+
+# Database
+*.db
+
+# Environment
+.env
+.env.*
+!.env.example
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+
+# Logs
+*.log
+
+# Claude Code
+.claude/
