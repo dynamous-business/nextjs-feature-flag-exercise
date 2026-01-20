@@ -1,8 +1,8 @@
+---
+description: Load project context. Build comprehensive understanding of this codebase by analyzing structure and key files.
+---
+
 # Prime Command
-
-## Input
-
-None.
 
 ## Why
 
