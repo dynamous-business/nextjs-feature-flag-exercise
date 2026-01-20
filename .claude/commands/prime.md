@@ -1,30 +1,66 @@
 ---
-description: Load project context. Build comprehensive understanding of this codebase by analyzing structure and key files.
+description: Prime agent with codebase understanding
 ---
 
-# Prime Command
+# Prime: Load Project Context
 
-## Why
+## Objective
 
-Before working on any task, you need to understand the codebase structure, tech stack, patterns, and current state.
+Build comprehensive understanding of this codebase by analyzing structure and key files.
 
-## Procedure
+## Process
 
-1. Study the client source (`client/src/`)
-2. Study the server source (`server/src/`)
-3. Study the shared types (`shared/types.ts`)
-4. Check recent commits with `git log --oneline -10`
+### 1. Analyze Project Structure
 
-## Output
+Show directory structure:
+!`find . -type f -name "*.ts" -o -name "*.tsx" | grep -v node_modules | head -50`
 
-Produce a scannable summary:
+### 2. Read Core Documentation
 
-- **Project Purpose**: One sentence
-- **Tech Stack**
-  - Frontend: framework, UI library, state management
-  - Backend: framework, database, validation
-- **Data Model**: Core entities
-- **Key Patterns**: Database, API, state management patterns
-- **Current State**: Recent commits, current branch
+- Read README.md
+- Read CLAUDE.md
+- Read task.md
 
-Use bullet points. Keep it concise.
+### 3. Study Key Files
+
+**Client:**
+- Read `client/src/main.tsx` and `client/src/App.tsx`
+- Scan components in `client/src/components/`
+- Check `client/package.json` for dependencies
+
+**Server:**
+- Read `server/src/index.ts`
+- Read services in `server/src/services/`
+- Read middleware in `server/src/middleware/`
+- Check `server/package.json` for dependencies
+
+**Shared:**
+- Read `shared/types.ts`
+
+### 4. Understand Current State
+
+!`git log -5 --oneline`
+!`git status`
+
+## Output Report
+
+Provide a concise summary covering:
+
+### Project Overview
+- Purpose of the application
+- Current state (what's implemented, what's the exercise)
+
+### Tech Stack
+- Frontend: framework, UI library, state management
+- Backend: framework, database, validation
+
+### Key Patterns
+- Database patterns
+- API patterns
+- Component patterns
+
+### Current State
+- Active branch
+- Recent commits
+
+**Keep it scannable - use bullet points.**
