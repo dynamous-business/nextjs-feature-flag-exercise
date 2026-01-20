@@ -1,62 +1,87 @@
 ---
-description: PR code review - checks diff, patterns, runs validation, comments on PR
-argument-hint: <pr-number|pr-url>
+description: Code review - reviews PRs, files, folders, or any code scope
+argument-hint: <pr-number|file|folder|scope>
 ---
 
-# PR Code Review
+# Code Review
 
 **Input**: $ARGUMENTS
 
 ## Your Mission
 
 Perform a thorough code review:
-1. **Understand** what the PR is trying to accomplish
+1. **Understand** what you're reviewing and its purpose
 2. **Check** the code against project patterns
 3. **Run** validation (type-check, lint, tests)
 4. **Identify** issues by severity
-5. **Report** findings as PR comment AND local file
+5. **Report** findings
 
 **Golden Rule**: Be constructive and actionable. Every issue should have a clear recommendation.
 
 ---
 
-## Phase 1: FETCH
+## Phase 1: DETERMINE SCOPE
 
-### Get PR Context
+### Parse Input
 
+| Input Type | Example | Action |
+|------------|---------|--------|
+| PR number | `123`, `#123` | Fetch PR diff with `gh pr diff 123` |
+| PR URL | `github.com/.../pull/123` | Extract number, fetch PR diff |
+| File path | `src/api/flags.ts` | Review single file |
+| Folder path | `server/src/` | Review all files in folder |
+| Blank | (none) | Review unstaged git changes |
+
+### Get Review Target
+
+**For PR:**
 ```bash
-# Get PR details
-gh pr view {NUMBER} --json number,title,body,author,headRefName,baseRefName,files
-
-# Get the diff
+gh pr view {NUMBER} --json number,title,author,files
 gh pr diff {NUMBER}
-
-# Checkout PR branch
-gh pr checkout {NUMBER}
 ```
 
-**Extract**: PR number, title, description, author, files changed.
+**For file/folder:**
+```bash
+# List files to review
+find {path} -name "*.ts" -o -name "*.tsx" | grep -v node_modules
+```
+
+**For blank (unstaged changes):**
+```bash
+git diff --name-only
+git diff
+```
 
 ---
 
-## Phase 2: REVIEW
+## Phase 2: CONTEXT
 
 ### Read Project Rules
 
 - Read `CLAUDE.md` for project conventions
-- Read `README.md` for context
+- Understand the patterns in the codebase
 
-### Review Each Changed File
+### Understand Intent
 
-For each file, check:
+- For PRs: Read title and description
+- For files: Understand the file's purpose in the codebase
+- For changes: What was modified and why?
+
+---
+
+## Phase 3: REVIEW
+
+### Review Each File
+
+For each file in scope, check:
 
 | Category | Check |
 |----------|-------|
-| **Correctness** | Does the code do what the PR claims? |
+| **Correctness** | Does the code work as intended? |
 | **Type Safety** | Are types explicit, no implicit `any`? |
 | **Patterns** | Does it follow existing codebase patterns? |
 | **Error Handling** | Are errors handled appropriately? |
-| **Tests** | Are there tests for new code? |
+| **Tests** | Are there tests for this code? |
 
 ### Categorize Issues
 
@@ -69,7 +94,7 @@ For each file, check:
 
 ---
 
-## Phase 3: VALIDATE
+## Phase 4: VALIDATE
 
 Run automated checks:
 
@@ -84,44 +109,27 @@ pnpm run lint
 pnpm test
 ```
 
-Capture pass/fail status for each.
-
----
-
-## Phase 4: DECIDE
-
-**APPROVE** if:
-- No critical or high issues
-- All validation passes
-- Code follows patterns
-
-**REQUEST CHANGES** if:
-- High priority issues exist
-- Validation fails
-- Pattern violations need addressing
-
 ---
 
 ## Phase 5: REPORT
 
 ### Create Report
 
-**Output path**: `.agents/reviews/pr-{NUMBER}-review.md`
+**Output path**: `.agents/reviews/{scope-name}-review.md`
 
 ```bash
 mkdir -p .agents/reviews
 ```
 
 ```markdown
-# PR Review: #{NUMBER} - {TITLE}
+# Code Review: {SCOPE}
 
-**Author**: @{author}
-**Branch**: {head} -> {base}
-**Recommendation**: {APPROVE/REQUEST CHANGES}
+**Scope**: {PR #N / file path / folder path / unstaged changes}
+**Recommendation**: {APPROVE/NEEDS WORK}
 
 ## Summary
 
-{2-3 sentences: What this PR does and overall assessment}
+{2-3 sentences: What was reviewed and overall assessment}
 
 ## Issues Found
 
@@ -151,15 +159,12 @@ mkdir -p .agents/reviews
 
 ## Recommendation
 
-**{APPROVE/REQUEST CHANGES}**
-
 {What needs to happen next}
 ```
 
-### Post to GitHub
+### Post to GitHub (if PR)
 
 ```bash
-# Post review
 gh pr review {NUMBER} --comment --body-file .agents/reviews/pr-{NUMBER}-review.md
 ```
 
@@ -168,10 +173,10 @@ gh pr review {NUMBER} --comment --body-file .agents/reviews/pr-{NUMBER}-review.m
 ## Phase 6: OUTPUT
 
 ```markdown
-## PR Review Complete
+## Review Complete
 
-**PR**: #{NUMBER} - {TITLE}
-**Recommendation**: {APPROVE/REQUEST CHANGES}
+**Scope**: {what was reviewed}
+**Recommendation**: {APPROVE/NEEDS WORK}
 
 ### Issues Found
 
@@ -189,7 +194,7 @@ gh pr review {NUMBER} --comment --body-file .agents/reviews/pr-{NUMBER}-review.m
 | Lint | {PASS/FAIL} |
 | Tests | {PASS/FAIL} |
 
-### Artifacts
+### Report
 
-- Report: `.agents/reviews/pr-{NUMBER}-review.md`
+`.agents/reviews/{scope-name}-review.md`
 ```
