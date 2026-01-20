@@ -17,7 +17,7 @@ Build comprehensive understanding of this codebase by analyzing structure and ke
 
 ## Output
 
-Produce a scannable summary:
+Produce a scannable summary of what you learned:
 
 - **Project Purpose**: One sentence
 - **Tech Stack**
