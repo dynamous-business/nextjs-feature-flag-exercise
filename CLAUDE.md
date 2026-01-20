@@ -8,7 +8,7 @@ This is an exercise for the Agentic Engineering Workshop. The task is to impleme
 
 ### Branch Rules
 
-- **Base branch**: `exercise-1` or `exercise-2`
+- **Base branch**: `exercise-2`
 - You may create new branches from these
 - **Never** commit or push to `main`
 
@@ -68,27 +68,3 @@ client/               # React frontend (port 3000)
 - `POST /api/flags` - Create flag
 - `PUT /api/flags/:id` - Update flag
 - `DELETE /api/flags/:id` - Delete flag
-
-## Custom Commands
-
-Available slash commands in `.claude/commands/`:
-
-- `/prime` - Load project context before working
-- `/prime-client` - Focus on frontend codebase
-- `/prime-server` - Focus on backend codebase
-- `/prime-components` - Learn component patterns
-- `/prime-endpoint` - Learn endpoint patterns (types → validation → service → route → client)
-- `/prd` - Generate a product requirements document
-- `/plan` - Create implementation plan from feature description
-- `/implement` - Execute a plan with validation loops
-- `/review` - Code review (PR, file, folder, or unstaged changes)
-- `/validate` - Run all linters, type checks, and tests
-- `/install` - Install dependencies and start both servers
-
-## Output Directories
-
-Commands that generate artifacts use `.agents/`:
-- `.agents/PRDs/` - Product requirement documents
-- `.agents/plans/` - Implementation plans
-- `.agents/reviews/` - Code review reports
-- `.agents/reports/` - Implementation reports
