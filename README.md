@@ -2,7 +2,7 @@
 
 A simple feature flag management application with a React frontend and Express backend. Users can create, edit, toggle, and delete feature flags with support for environments, rollout percentages, and flag types.
 
-This is a workshop exercise directory. See [task.md](./task.md) for the exercise you need to complete.
+This is a workshop exercise directory. See [TASK.md](./TASK.md) for the exercise you need to complete.
 
 ## Quick Start
 
