@@ -20,6 +20,3 @@ dist/
 
 # Logs
 *.log
-
-# Claude Code
-.claude/
