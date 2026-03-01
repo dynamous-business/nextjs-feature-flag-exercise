@@ -14,31 +14,29 @@ tools:
 
 ## Objective
 
-Understand the full vertical slice pattern so you can build new feature endpoints correctly.
+Understand the full endpoint pattern from database to UI so you can build new endpoints correctly.
 
 ## Process
 
-Study these files in order (this is the vertical slice data flow):
+Study these files in order (this is the data flow):
 
-1. **Models**: Feature `models.py` — SQLAlchemy models inheriting `Base` and `TimestampMixin`
-2. **Schemas**: Feature `schemas.py` — Pydantic models for request/response validation
-3. **Service**: Feature `service.py` — async business logic and database operations
-4. **Routes**: Feature `routes.py` — FastAPI route handlers with dependency injection
-5. **Tests**: Feature `tests/` — pytest tests with async support
-6. **Registration**: `app/main.py` — how routers are included via `app.include_router()`
-7. **Shared**: `app/shared/` — pagination, timestamps, error schemas
-8. **Core**: `app/core/exceptions.py` — custom exception classes and handlers
+1. **Types**: `shared/types.ts` - define your data contracts here first
+2. **Validation**: `server/src/middleware/validation.ts` - Zod schemas for request validation
+3. **Service**: `server/src/services/flags.ts` - business logic and database operations
+4. **Routes**: `server/src/routes/flags.ts` - Express route handlers
+5. **Error handling**: `server/src/middleware/error.ts` - custom error classes
+6. **Client API**: `client/src/api/flags.ts` - fetch wrappers with types
+7. **Usage**: `client/src/App.tsx` - React Query hooks for data fetching
 
 ## Output
 
 Produce a scannable summary of what you learned:
 
-- **Vertical Slice**: How features are self-contained (models, schemas, routes, service, tests)
-- **Model Pattern**: Base class, TimestampMixin, async SQLAlchemy 2.0 style
-- **Schema Pattern**: Pydantic models for validation and serialization
-- **Service Pattern**: How business logic and database queries are structured
-- **Route Pattern**: How routes use dependency injection (`get_db()`, path params)
-- **Error Handling**: Custom exceptions and global handlers
-- **Logging**: Structured logging with `domain.action_state` pattern
+- **Type Flow**: How types are shared between server and client
+- **Validation**: How request data is validated
+- **Service Pattern**: How business logic is structured
+- **Route Pattern**: How routes call services and handle errors
+- **Client Pattern**: How the frontend fetches and mutates data
+- **React Query**: How queries and mutations are used
 
 Use bullet points. Keep it concise.

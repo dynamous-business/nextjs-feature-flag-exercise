@@ -1,5 +1,5 @@
 ---
-description: "Prime agent with backend codebase understanding"
+description: "Prime agent with server/backend codebase understanding"
 agent: "plan"
 tools:
   - codebase
@@ -14,25 +14,24 @@ tools:
 
 ## Objective
 
-Build comprehensive understanding of the FastAPI backend by analyzing structure and key files.
+Build comprehensive understanding of the server codebase by analyzing structure and key files.
 
 ## Process
 
-1. Study the entry point (`app/main.py`)
-2. Study core infrastructure (`app/core/` — config, database, logging, middleware, health, exceptions)
-3. Study shared utilities (`app/shared/` — pagination, timestamps, error schemas)
-4. Study any feature directories under `app/` (e.g., `app/products/`, `app/orders/`)
-5. Check `pyproject.toml` for dependencies and tooling config
-6. Check `alembic/` for migration setup
+1. Study the entry point (`server/src/index.ts`)
+2. Study the services (`server/src/services/`)
+3. Study the middleware (`server/src/middleware/`)
+4. Study the database layer (`server/src/db/`)
+5. Check `server/package.json` for dependencies
 
 ## Output
 
 Produce a scannable summary of what you learned:
 
 - **Purpose**: What the backend does
-- **Tech Stack**: FastAPI, SQLAlchemy async, PostgreSQL, structlog
-- **API Routes**: Available endpoints (health, features)
-- **Data Model**: Core entities and their relationships
-- **Patterns**: Vertical slice architecture, async database patterns, structured logging, error handling
+- **Tech Stack**: Framework, database, validation
+- **API Routes**: Available endpoints
+- **Data Model**: Core entities from `shared/types.ts`
+- **Patterns**: Database patterns, error handling, validation approach
 
 Use bullet points. Keep it concise.
