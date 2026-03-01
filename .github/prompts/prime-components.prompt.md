@@ -1,5 +1,5 @@
 ---
-description: "Learn Pydantic schema and dependency injection patterns in this codebase"
+description: "Learn how to build components in this codebase"
 agent: "plan"
 tools:
   - codebase
@@ -10,28 +10,29 @@ tools:
   - usages
 ---
 
-# Prime Schemas: How to Build Schemas and Dependencies
+# Prime Components: How to Build Components
 
 ## Objective
 
-Understand the Pydantic schema patterns and FastAPI dependency injection used in this codebase so you can build new ones correctly.
+Understand the component patterns used in this codebase so you can build new components correctly.
 
 ## Process
 
-1. Study shared schemas in `app/shared/schemas.py` (pagination, error responses)
-2. Study shared models in `app/shared/models.py` (TimestampMixin, base patterns)
-3. Study feature schemas as examples (any feature `schemas.py`)
-4. Study `app/core/database.py` for the `get_db()` dependency
-5. Study `app/core/config.py` for the settings dependency pattern
+1. Study the UI primitives in `client/src/components/ui/` (shadcn components)
+2. Study `client/src/lib/utils.ts` for the `cn()` utility
+3. Study feature components as examples:
+   - `client/src/components/flags-table.tsx` - data display pattern
+   - `client/src/components/flag-form-modal.tsx` - form with dialog pattern
+   - `client/src/components/delete-confirm-dialog.tsx` - confirmation dialog pattern
 
 ## Output
 
 Produce a scannable summary of what you learned:
 
-- **Pydantic Models**: How request/response schemas are defined
-- **Validation**: How input validation is handled via Pydantic
-- **Generics**: How `PaginatedResponse[T]` uses generic types
-- **Dependencies**: How `get_db()` and `get_settings()` work with FastAPI DI
-- **Type Safety**: How strict typing is enforced across schemas
+- **UI Library**: Available shadcn components
+- **Styling**: How Tailwind and cn() are used
+- **Props Pattern**: How props interfaces are defined
+- **Composition**: How feature components compose UI primitives
+- **State**: How local state is managed in components
 
 Use bullet points. Keep it concise.

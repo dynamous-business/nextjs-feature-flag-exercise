@@ -28,10 +28,10 @@ In your group, discuss and document:
 
 ## Command Template
 
-Use the commands from Exercise 2 as reference:
+Use the prompts from Exercise 2 as reference:
 
 ```
-.claude/commands/
+.github/prompts/
 ```
 
 ## Example Workflows to Consider
