@@ -1,5 +1,5 @@
 ---
-description: "Create global rules (copilot-instructions.md) from codebase analysis"
+description: "Create global rules (AGENTS.md) from codebase analysis"
 agent: "agent"
 tools:
   - codebase
@@ -14,18 +14,18 @@ tools:
 
 # Create Global Rules
 
-Generate a `.github/copilot-instructions.md` file by analyzing the codebase and extracting patterns.
+Generate an `AGENTS.md` file by analyzing the codebase and extracting patterns.
 
 ---
 
 ## Objective
 
-Create project-specific custom instructions that give Copilot context about:
+Create project-specific global rules that give AI coding agents context about:
 - What this project is
 - Technologies used
 - How the code is organized
 - Patterns and conventions to follow
-- How to test and validate
+- How to build, test, and validate
 
 ---
 
@@ -37,25 +37,24 @@ First, determine what kind of project this is:
 
 | Type | Indicators |
 |------|------------|
-| API/Backend | FastAPI/Django/Flask, database models, route handlers |
-| CLI Tool | `entry_points` in pyproject.toml, argparse/click |
-| Library/Package | Publishable, `build-system` in pyproject.toml |
-| Full-stack | Backend + frontend directories |
-| Data/ML | Jupyter notebooks, pandas, scikit-learn, torch |
+| Web App (Full-stack) | Separate client/server dirs, API routes |
+| Web App (Frontend) | React/Vue/Svelte, no server code |
+| API/Backend | Express/Fastify/etc, no frontend |
+| Library/Package | `main`/`exports` in package.json, publishable |
+| CLI Tool | `bin` in package.json, command-line interface |
+| Monorepo | Multiple packages, workspaces config |
 | Script/Automation | Standalone scripts, task-focused |
-| Monorepo | Multiple packages, workspace config |
 
 ### Analyze Configuration
 
 Look at root configuration files:
 
 ```
-pyproject.toml     → dependencies, scripts, tool config
-alembic.ini        → database migration settings
-CLAUDE.md          → AI coding conventions
-.env.example       → environment variables
-Dockerfile         → container setup
-docker-compose.yml → service orchestration
+package.json       → dependencies, scripts, type
+tsconfig.json      → TypeScript settings
+vite.config.*      → Build tool
+*.config.js/ts     → Various tool configs
+AGENTS.md          → AI coding conventions
 ```
 
 ### Map Directory Structure
@@ -72,24 +71,22 @@ Explore the codebase to understand organization:
 
 ### Extract Tech Stack
 
-From pyproject.toml and config files, identify:
-- Runtime/Language (Python version, async support)
-- Framework(s) (FastAPI, SQLAlchemy, etc.)
-- Database (PostgreSQL, SQLite, etc.)
-- Testing tools (pytest, pytest-asyncio, etc.)
-- Type checking (mypy, pyright)
-- Linting/formatting (ruff, black, etc.)
-- Package manager (uv, pip, poetry)
+From package.json and config files, identify:
+- Runtime/Language (Node, Bun, Deno, browser)
+- Framework(s)
+- Database (if any)
+- Testing tools
+- Build tools
+- Linting/formatting
 
 ### Identify Patterns
 
 Study existing code for:
 - **Naming**: How are files, functions, classes named?
-- **Structure**: How is code organized within files? (vertical slice, layered, etc.)
-- **Errors**: How are exceptions created and handled?
-- **Types**: How are Pydantic models and SQLAlchemy models defined?
+- **Structure**: How is code organized within files?
+- **Errors**: How are errors created and handled?
+- **Types**: How are types/interfaces defined?
 - **Tests**: How are tests structured?
-- **Logging**: What logging pattern is used?
 
 ### Find Key Files
 
@@ -104,11 +101,11 @@ Identify files that are important to understand:
 
 ## Phase 3: GENERATE
 
-### Create copilot-instructions.md
+### Create AGENTS.md
 
-Use the template at `.github/copilot-instructions-template.md` as a starting point.
+Use the template at `.agents/AGENTS-template.md` as a starting point.
 
-**Output path**: `.github/copilot-instructions.md`
+**Output path**: `AGENTS.md` (project root)
 
 **Adapt to the project:**
 - Remove sections that don't apply
@@ -119,7 +116,7 @@ Use the template at `.github/copilot-instructions-template.md` as a starting poi
 
 1. **Project Overview** - What is this and what does it do?
 2. **Tech Stack** - What technologies are used?
-3. **Commands** - How to dev, test, lint, type-check?
+3. **Commands** - How to dev, build, test, lint?
 4. **Structure** - How is the code organized?
 5. **Patterns** - What conventions should be followed?
 6. **Key Files** - What files are important to know?
@@ -127,8 +124,8 @@ Use the template at `.github/copilot-instructions-template.md` as a starting poi
 **Optional sections (add if relevant):**
 - Architecture (for complex apps)
 - API endpoints (for backends)
+- Component patterns (for frontends)
 - Database patterns (if using a DB)
-- Logging conventions
 - On-demand context references
 
 ---
@@ -138,7 +135,7 @@ Use the template at `.github/copilot-instructions-template.md` as a starting poi
 ```markdown
 ## Global Rules Created
 
-**File**: `.github/copilot-instructions.md`
+**File**: `AGENTS.md`
 
 ### Project Type
 
@@ -154,17 +151,17 @@ Use the template at `.github/copilot-instructions-template.md` as a starting poi
 
 ### Next Steps
 
-1. Review the generated `copilot-instructions.md`
+1. Review the generated `AGENTS.md`
 2. Add any project-specific notes
 3. Remove any sections that don't apply
-4. Optionally create reference docs for deeper context
+4. Optionally create reference docs in `.agents/reference/`
 ```
 
 ---
 
 ## Tips
 
-- Keep copilot-instructions.md focused and scannable
+- Keep AGENTS.md focused and scannable
 - Don't duplicate information that's in other docs (link instead)
 - Focus on patterns and conventions, not exhaustive documentation
 - Update it as the project evolves

@@ -1,5 +1,5 @@
 ---
-description: "Run linter, type checkers, and tests - report any failures"
+description: "Run linter, type checker, and tests - report any failures"
 agent: "agent"
 tools:
   - runInTerminal
@@ -16,32 +16,41 @@ Run all validation checks and report results.
 
 ## Checks to Run
 
+### Server (server/)
+
 ```bash
-# Linting
-uv run ruff check .
+cd server
 
-# Formatting check
-uv run ruff format --check .
+# Lint
+pnpm run lint
 
-# Type check (MyPy strict)
-uv run mypy app/
-
-# Type check (Pyright strict)
-uv run pyright app/
+# Type check (via build)
+pnpm run build
 
 # Tests
-uv run pytest -v
+pnpm test
+```
+
+### Client (client/)
+
+```bash
+cd client
+
+# Lint
+pnpm run lint
+
+# Type check (via build)
+pnpm run build
 ```
 
 ---
 
 ## Process
 
-1. Run linting and formatting checks, capture output
-2. Run both type checkers, capture output
-3. Run tests, capture output
-4. Collect all failures
-5. Report results
+1. Run server checks, capture output
+2. Run client checks, capture output
+3. Collect all failures
+4. Report results
 
 ---
 
@@ -52,16 +61,21 @@ Report in this format:
 ```
 ## Validation Results
 
+### Server
 | Check | Result | Details |
 |-------|--------|---------|
-| Ruff lint | pass/fail | {N errors or "passed"} |
-| Ruff format | pass/fail | {N files need formatting or "passed"} |
-| MyPy | pass/fail | {N errors or "passed"} |
-| Pyright | pass/fail | {N errors or "passed"} |
-| Tests | pass/fail | {N passed, M failed} |
+| Lint | ✅/❌ | {N errors or "passed"} |
+| Type check | ✅/❌ | {N errors or "passed"} |
+| Tests | ✅/❌ | {N passed, M failed} |
+
+### Client
+| Check | Result | Details |
+|-------|--------|---------|
+| Lint | ✅/❌ | {N errors or "passed"} |
+| Type check | ✅/❌ | {N errors or "passed"} |
 
 ### Summary
-- **Status**: ALL PASSING / {N} FAILURES
+- **Status**: ✅ ALL PASSING / ❌ {N} FAILURES
 - **Action needed**: {None / list of things to fix}
 ```
 
@@ -78,11 +92,11 @@ Example:
 ```
 ### Failures
 
-1. **app/core/health.py:42**
-   - Error: `Incompatible return type "str"; expected "dict[str, Any]"`
-   - Fix: Update return type annotation
+1. **server/src/services/flags.ts:42**
+   - Error: `Type 'string' is not assignable to type 'number'`
+   - Fix: Check the type annotation or value
 
-2. **app/shared/schemas.py:15**
-   - Error: `Variable "x" is not defined`
-   - Fix: Remove unused variable or add import
+2. **client/src/components/App.tsx:15**
+   - Error: `'x' is defined but never used`
+   - Fix: Remove unused variable or prefix with `_`
 ```

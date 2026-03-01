@@ -52,18 +52,18 @@ Search through the codebase to find:
 
 1. **Similar implementations** - analogous features with file:line references
 2. **Naming conventions** - actual examples from the codebase
-3. **Error handling patterns** - how exceptions are raised and handled
-4. **Type definitions** - relevant Pydantic schemas and SQLAlchemy models
+3. **Error handling patterns** - how errors are created and handled
+4. **Type definitions** - relevant interfaces and types in `shared/types.ts`
 5. **Test patterns** - test file structure and assertion styles
 
 ### Document Patterns
 
 | Category | File:Lines | Pattern |
 |----------|------------|---------|
-| NAMING | `app/feature/models.py:10-15` | {pattern description} |
-| ERRORS | `app/core/exceptions.py:20-30` | {pattern description} |
-| SCHEMAS | `app/feature/schemas.py:1-10` | {pattern description} |
-| TESTS | `app/feature/tests/test_service.py:1-25` | {pattern description} |
+| NAMING | `path/to/file.ts:10-15` | {pattern description} |
+| ERRORS | `path/to/file.ts:20-30` | {pattern description} |
+| TYPES | `shared/types.ts:1-10` | {pattern description} |
+| TESTS | `path/to/test.ts:1-25` | {pattern description} |
 
 ---
 
@@ -71,8 +71,8 @@ Search through the codebase to find:
 
 ### Map the Changes
 
-- What files need to be created? (Follow vertical slice: models, schemas, routes, service, tests)
-- What files need to be modified? (e.g., `app/main.py` for router registration)
+- What files need to be created?
+- What files need to be modified?
 - What's the dependency order?
 
 ### Identify Risks
@@ -120,19 +120,19 @@ So that {benefit}
 
 ### Naming
 ```
-# SOURCE: {file:lines}
+// SOURCE: {file:lines}
 {actual code snippet}
 ```
 
 ### Error Handling
 ```
-# SOURCE: {file:lines}
+// SOURCE: {file:lines}
 {actual code snippet}
 ```
 
 ### Tests
 ```
-# SOURCE: {file:lines}
+// SOURCE: {file:lines}
 {actual code snippet}
 ```
 
@@ -142,12 +142,8 @@ So that {benefit}
 
 | File | Action | Purpose |
 |------|--------|---------|
-| `app/feature/models.py` | CREATE | {why} |
-| `app/feature/schemas.py` | CREATE | {why} |
-| `app/feature/routes.py` | CREATE | {why} |
-| `app/feature/service.py` | CREATE | {why} |
-| `app/feature/tests/test_service.py` | CREATE | {why} |
-| `app/main.py` | UPDATE | Register router |
+| `path/to/file.ts` | CREATE | {why} |
+| `path/to/other.ts` | UPDATE | {why} |
 
 ---
 
@@ -157,19 +153,19 @@ Execute in order. Each task is atomic and verifiable.
 
 ### Task 1: {Description}
 
-- **File**: `app/feature/models.py`
+- **File**: `path/to/file.ts`
 - **Action**: CREATE / UPDATE
 - **Implement**: {what to do}
-- **Mirror**: `app/existing/models.py:lines` - follow this pattern
-- **Validate**: `uv run mypy app/ && uv run pyright app/`
+- **Mirror**: `path/to/example.ts:lines` - follow this pattern
+- **Validate**: `pnpm run build`
 
 ### Task 2: {Description}
 
-- **File**: `app/feature/schemas.py`
+- **File**: `path/to/file.ts`
 - **Action**: CREATE / UPDATE
 - **Implement**: {what to do}
-- **Mirror**: `app/existing/schemas.py:lines`
-- **Validate**: `uv run mypy app/ && uv run pyright app/`
+- **Mirror**: `path/to/example.ts:lines`
+- **Validate**: `pnpm run build`
 
 {Continue for each task...}
 
@@ -178,20 +174,14 @@ Execute in order. Each task is atomic and verifiable.
 ## Validation
 
 ```bash
+# Type check
+pnpm run build
+
 # Lint
-uv run ruff check .
-
-# Format
-uv run ruff format --check .
-
-# Type check (MyPy strict)
-uv run mypy app/
-
-# Type check (Pyright strict)
-uv run pyright app/
+pnpm run lint
 
 # Tests
-uv run pytest -v
+pnpm test
 ```
 
 ---
@@ -199,11 +189,9 @@ uv run pytest -v
 ## Acceptance Criteria
 
 - [ ] All tasks completed
-- [ ] Ruff lint passes
-- [ ] MyPy strict passes
-- [ ] Pyright strict passes
+- [ ] Type check passes
 - [ ] Tests pass
-- [ ] Follows vertical slice architecture
+- [ ] Follows existing patterns
 ```
 
 ---
