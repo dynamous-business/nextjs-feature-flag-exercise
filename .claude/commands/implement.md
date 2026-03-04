@@ -128,18 +128,22 @@ You MUST write tests for new code:
 2. Fix the actual issue
 3. Re-run until green
 
-### End-to-End Verification
+### REQUIRED: End-to-End Verification
 
-**After all static checks and tests pass, re-read the plan and check for end-to-end testing instructions.** If the plan includes end-to-end testing steps, you MUST execute every single one of them systematically. Do not skip any.
+> **⚠️ Do NOT proceed to Phase 5 (Report) until all E2E steps below pass.**
 
-For each end-to-end test specified in the plan:
+Re-read the plan and find the end-to-end testing section. Execute every E2E test listed in the plan as a checklist:
 
-1. **Start the application** — spin up dev servers, databases, or whatever the project requires
-2. **Execute the test exactly as described** — follow the plan's instructions for what to test and how
-3. **Verify the expected outcome** — confirm the result matches what the plan says should happen
-4. **If a test fails**, fix the issue and re-run until it passes before moving to the next one
+- [ ] Start the application (dev servers, databases, etc.)
+- [ ] For EACH end-to-end test in the plan:
+  - [ ] Execute the test exactly as described
+  - [ ] Verify the expected outcome matches the plan
+  - [ ] If it fails: fix the issue, re-run, confirm it passes
+- [ ] Confirm all E2E tests pass before proceeding
 
-**This is critical.** Missing end-to-end testing is not acceptable. Static checks and unit tests are not sufficient — the plan's end-to-end tests verify the feature works as a whole.
+**If the plan has no E2E tests**, perform a basic smoke test: start the app, exercise the new/changed feature manually, verify it works.
+
+**This is a hard gate.** You cannot report the implementation as complete until E2E verification passes. Static checks and unit tests alone are never sufficient.
 
 ---
 
