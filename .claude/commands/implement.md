@@ -58,15 +58,20 @@ git status
 
 **For each task in the plan:**
 
-### 3.1 Read Context
+### 3.1 Verify Assumptions
 
-- Read the **MIRROR** file reference
-- Understand the pattern to follow
+Before writing any code for a task:
+
+- **Read the target file** you're about to create or modify
+- **Read adjacent files** — files it imports from, and files that import it
+- **Verify the plan's references** — do the functions, interfaces, tables, or endpoints the plan mentions actually exist? Do they match the plan's expectations?
+- **If assumptions are wrong**, adapt your approach before implementing. Document what differs from the plan.
 
 ### 3.2 Implement
 
-- Make the change as specified
-- Follow the pattern from MIRROR reference
+- Read the **MIRROR** file reference and understand the pattern to follow
+- Make the change as specified in the plan
+- **Check integration**: verify your change connects correctly to adjacent code — do imports resolve? Do callers/callees still work? Does the data flow correctly across boundaries?
 
 ### 3.3 Validate Immediately
 
@@ -114,13 +119,31 @@ pnpm test
 
 You MUST write tests for new code:
 - Every new function needs at least one test
-- Edge cases need tests
+- Error cases and edge cases need tests
 - Update existing tests if behavior changed
+- **Test across boundaries** — don't just test functions in isolation. If you added an API endpoint, test that the endpoint returns the correct response shape and data. If you added a service method, test that it integrates correctly with its callers.
 
 **If tests fail:**
 1. Determine: bug in implementation or test?
 2. Fix the actual issue
 3. Re-run until green
+
+### REQUIRED: End-to-End Verification
+
+> **⚠️ Do NOT proceed to Phase 5 (Report) until all E2E steps below pass.**
+
+Re-read the plan and find the end-to-end testing section. Execute every E2E test listed in the plan as a checklist:
+
+- [ ] Start the application (dev servers, databases, etc.)
+- [ ] For EACH end-to-end test in the plan:
+  - [ ] Execute the test exactly as described
+  - [ ] Verify the expected outcome matches the plan
+  - [ ] If it fails: fix the issue, re-run, confirm it passes
+- [ ] Confirm all E2E tests pass before proceeding
+
+**If the plan has no E2E tests**, perform a basic smoke test: start the app, exercise the new/changed feature manually, verify it works.
+
+**This is a hard gate.** You cannot report the implementation as complete until E2E verification passes. Static checks and unit tests alone are never sufficient.
 
 ---
 
