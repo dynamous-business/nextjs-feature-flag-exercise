@@ -58,19 +58,24 @@ git status
 
 **For each task in the plan:**
 
-### 3.1 Read Context
+### 3.1 Verify Assumptions
 
-- Read the **MIRROR** file reference
-- Understand the pattern to follow
+Before writing any code for a task:
+
+- **Read the target file** you're about to create or modify
+- **Read adjacent files** — files it imports from, and files that import it
+- **Verify the plan's references** — do the functions, interfaces, tables, or endpoints the plan mentions actually exist? Do they match the plan's expectations?
+- **If assumptions are wrong**, adapt your approach before implementing. Document what differs from the plan.
 
 ### 3.2 Implement
 
-- Make the change as specified
-- Follow the pattern from MIRROR reference
+- Read the **MIRROR** file reference and understand the pattern to follow
+- Make the change as specified in the plan
+- **Check integration**: verify your change connects correctly to adjacent code — do imports resolve? Do callers/callees still work? Does the data flow correctly across boundaries?
 
 ### 3.3 Validate Immediately
 
-**After EVERY file change:**
+**After EVERY task:**
 
 ```bash
 pnpm run build
@@ -114,13 +119,27 @@ pnpm test
 
 You MUST write tests for new code:
 - Every new function needs at least one test
-- Edge cases need tests
+- Error cases and edge cases need tests
 - Update existing tests if behavior changed
+- **Test across boundaries** — don't just test functions in isolation. If you added an API endpoint, test that the endpoint returns the correct response shape and data. If you added a service method, test that it integrates correctly with its callers.
 
 **If tests fail:**
 1. Determine: bug in implementation or test?
 2. Fix the actual issue
 3. Re-run until green
+
+### End-to-End Verification
+
+**After all static checks and tests pass, re-read the plan and check for end-to-end testing instructions.** If the plan includes end-to-end testing steps, you MUST execute every single one of them systematically. Do not skip any.
+
+For each end-to-end test specified in the plan:
+
+1. **Start the application** — spin up dev servers, databases, or whatever the project requires
+2. **Execute the test exactly as described** — follow the plan's instructions for what to test and how
+3. **Verify the expected outcome** — confirm the result matches what the plan says should happen
+4. **If a test fails**, fix the issue and re-run until it passes before moving to the next one
+
+**This is critical.** Missing end-to-end testing is not acceptable. Static checks and unit tests are not sufficient — the plan's end-to-end tests verify the feature works as a whole.
 
 ---
 
