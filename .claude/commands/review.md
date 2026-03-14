@@ -58,7 +58,6 @@ git diff
 
 ### Read Project Rules
 
-- Read `CLAUDE.md` for project conventions
 - Understand the patterns in the codebase
 
 ### Understand Intent
