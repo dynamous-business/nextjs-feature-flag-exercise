@@ -28,6 +28,7 @@ Load the plan file and extract:
 - **Files to Change** - CREATE/UPDATE list
 - **Tasks** - Implementation order
 - **Validation Commands** - How to verify
+- **Jira Issue** - Check the plan's Metadata table for a Jira Issue key (e.g., `RH-5`). If present, this issue will be updated after implementation is complete.
 
 **If plan not found:**
 ```
@@ -75,7 +76,7 @@ Before writing any code for a task:
 
 ### 3.3 Validate Immediately
 
-**After EVERY file change:**
+**After EVERY task:**
 
 ```bash
 pnpm run build
@@ -210,7 +211,47 @@ mv $ARGUMENTS .agents/plans/completed/
 
 ---
 
-## Phase 6: OUTPUT
+## Phase 6: UPDATE JIRA (if issue specified in plan)
+
+**This phase is mandatory if the plan's Metadata table contains a Jira Issue key.** Skip only if the Jira Issue field is "N/A" or absent.
+
+### 6.1 Resolve Cloud ID
+
+Call `mcp__atlassian__getAccessibleAtlassianResources` to get the `cloudId`.
+
+### 6.2 Transition the Issue
+
+1. Call `mcp__atlassian__getTransitionsForJiraIssue` with `cloudId` and `issueIdOrKey` to get available transitions — each transition has a numeric `id` and a `name`
+2. Find the most appropriate transition (prefer "In Review" or "In Progress"; fall back to "Done" if no review state exists)
+3. Call `mcp__atlassian__transitionJiraIssue` with:
+   - `cloudId`: The Cloud ID
+   - `issueIdOrKey`: The issue key
+   - `transition`: `{ "id": "{transition_id}" }` — use the numeric ID from step 1, NOT the status name
+
+### 6.3 Add Implementation Comment
+
+Call `mcp__atlassian__addCommentToJiraIssue` with:
+- `issueIdOrKey`: The Jira issue key from the plan
+- `contentFormat`: `"markdown"`
+- `commentBody`: A summary including:
+  - What was implemented
+  - Branch name
+  - Files created/updated (count)
+  - Tests written (count)
+  - Any deviations from the plan
+  - Link to the implementation report file path
+
+### 6.4 Update Issue Description (if needed)
+
+If the implementation resulted in meaningful deviations from the original issue description, call `mcp__atlassian__editJiraIssue` with:
+- `cloudId`: The Cloud ID
+- `issueIdOrKey`: The issue key
+- `contentFormat`: `"markdown"`
+- `fields`: An object with the fields to update, e.g. `{ "description": "updated description..." }`
+
+---
+
+## Phase 7: OUTPUT
 
 ```markdown
 ## Implementation Complete
@@ -241,6 +282,10 @@ mv $ARGUMENTS .agents/plans/completed/
 
 - Report: `.agents/reports/{name}-report.md`
 - Plan archived: `.agents/plans/completed/`
+
+### Jira
+
+{If issue was updated: "Updated {ISSUE_KEY}: transitioned to {status}, added implementation comment." Otherwise: "No Jira issue linked."}
 
 ### Next Steps
 
