@@ -34,6 +34,7 @@ Transform the input into a battle-tested implementation plan through codebase ex
 - **User Story**: As a [user], I want to [action], so that [benefit]
 - **Type**: NEW_CAPABILITY / ENHANCEMENT / REFACTOR / BUG_FIX
 - **Complexity**: LOW / MEDIUM / HIGH
+- **Jira Issue**: If a Jira issue key (e.g., `RH-5`) is available in the conversation context — from a prior `/prime` command, user mention, or PRD — capture it. This is optional but should be included in the plan metadata when available so that `/implement` can update the issue after completion.
 
 ---
 
@@ -106,6 +107,7 @@ So that {benefit}
 | Type | {type} |
 | Complexity | {LOW/MEDIUM/HIGH} |
 | Systems Affected | {list} |
+| Jira Issue | {issue key if available, e.g. RH-5, or "N/A"} |
 
 ---
 
