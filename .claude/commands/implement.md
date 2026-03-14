@@ -28,6 +28,7 @@ Load the plan file and extract:
 - **Files to Change** - CREATE/UPDATE list
 - **Tasks** - Implementation order
 - **Validation Commands** - How to verify
+- **Jira Issue** - Check the plan's Metadata table for a Jira Issue key (e.g., `RH-5`). If present, this issue will be updated after implementation is complete.
 
 **If plan not found:**
 ```
@@ -58,19 +59,24 @@ git status
 
 **For each task in the plan:**
 
-### 3.1 Read Context
+### 3.1 Verify Assumptions
 
-- Read the **MIRROR** file reference
-- Understand the pattern to follow
+Before writing any code for a task:
+
+- **Read the target file** you're about to create or modify
+- **Read adjacent files** — files it imports from, and files that import it
+- **Verify the plan's references** — do the functions, interfaces, tables, or endpoints the plan mentions actually exist? Do they match the plan's expectations?
+- **If assumptions are wrong**, adapt your approach before implementing. Document what differs from the plan.
 
 ### 3.2 Implement
 
-- Make the change as specified
-- Follow the pattern from MIRROR reference
+- Read the **MIRROR** file reference and understand the pattern to follow
+- Make the change as specified in the plan
+- **Check integration**: verify your change connects correctly to adjacent code — do imports resolve? Do callers/callees still work? Does the data flow correctly across boundaries?
 
 ### 3.3 Validate Immediately
 
-**After EVERY file change:**
+**After EVERY task:**
 
 ```bash
 pnpm run build
@@ -114,13 +120,31 @@ pnpm test
 
 You MUST write tests for new code:
 - Every new function needs at least one test
-- Edge cases need tests
+- Error cases and edge cases need tests
 - Update existing tests if behavior changed
+- **Test across boundaries** — don't just test functions in isolation. If you added an API endpoint, test that the endpoint returns the correct response shape and data. If you added a service method, test that it integrates correctly with its callers.
 
 **If tests fail:**
 1. Determine: bug in implementation or test?
 2. Fix the actual issue
 3. Re-run until green
+
+### REQUIRED: End-to-End Verification
+
+> **⚠️ Do NOT proceed to Phase 5 (Report) until all E2E steps below pass.**
+
+Re-read the plan and find the end-to-end testing section. Execute every E2E test listed in the plan as a checklist:
+
+- [ ] Start the application (dev servers, databases, etc.)
+- [ ] For EACH end-to-end test in the plan:
+  - [ ] Execute the test exactly as described
+  - [ ] Verify the expected outcome matches the plan
+  - [ ] If it fails: fix the issue, re-run, confirm it passes
+- [ ] Confirm all E2E tests pass before proceeding
+
+**If the plan has no E2E tests**, perform a basic smoke test: start the app, exercise the new/changed feature manually, verify it works.
+
+**This is a hard gate.** You cannot report the implementation as complete until E2E verification passes. Static checks and unit tests alone are never sufficient.
 
 ---
 
@@ -187,7 +211,47 @@ mv $ARGUMENTS .agents/plans/completed/
 
 ---
 
-## Phase 6: OUTPUT
+## Phase 6: UPDATE JIRA (if issue specified in plan)
+
+**This phase is mandatory if the plan's Metadata table contains a Jira Issue key.** Skip only if the Jira Issue field is "N/A" or absent.
+
+### 6.1 Resolve Cloud ID
+
+Call `mcp__atlassian__getAccessibleAtlassianResources` to get the `cloudId`.
+
+### 6.2 Transition the Issue
+
+1. Call `mcp__atlassian__getTransitionsForJiraIssue` with `cloudId` and `issueIdOrKey` to get available transitions — each transition has a numeric `id` and a `name`
+2. Find the most appropriate transition (prefer "In Review" or "In Progress"; fall back to "Done" if no review state exists)
+3. Call `mcp__atlassian__transitionJiraIssue` with:
+   - `cloudId`: The Cloud ID
+   - `issueIdOrKey`: The issue key
+   - `transition`: `{ "id": "{transition_id}" }` — use the numeric ID from step 1, NOT the status name
+
+### 6.3 Add Implementation Comment
+
+Call `mcp__atlassian__addCommentToJiraIssue` with:
+- `issueIdOrKey`: The Jira issue key from the plan
+- `contentFormat`: `"markdown"`
+- `commentBody`: A summary including:
+  - What was implemented
+  - Branch name
+  - Files created/updated (count)
+  - Tests written (count)
+  - Any deviations from the plan
+  - Link to the implementation report file path
+
+### 6.4 Update Issue Description (if needed)
+
+If the implementation resulted in meaningful deviations from the original issue description, call `mcp__atlassian__editJiraIssue` with:
+- `cloudId`: The Cloud ID
+- `issueIdOrKey`: The issue key
+- `contentFormat`: `"markdown"`
+- `fields`: An object with the fields to update, e.g. `{ "description": "updated description..." }`
+
+---
+
+## Phase 7: OUTPUT
 
 ```markdown
 ## Implementation Complete
@@ -218,6 +282,10 @@ mv $ARGUMENTS .agents/plans/completed/
 
 - Report: `.agents/reports/{name}-report.md`
 - Plan archived: `.agents/plans/completed/`
+
+### Jira
+
+{If issue was updated: "Updated {ISSUE_KEY}: transitioned to {status}, added implementation comment." Otherwise: "No Jira issue linked."}
 
 ### Next Steps
 
