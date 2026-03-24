@@ -1,5 +1,5 @@
 ---
-description: Interactive PRD generator - problem-first, hypothesis-driven product spec
+description: Interactive PRD generator - asks questions to build a PRD
 argument-hint: [feature/product idea] (blank = start with questions)
 ---
 
