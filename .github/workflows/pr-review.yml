@@ -1,0 +1,35 @@
+name: PR Review
+
+on:
+  pull_request:
+    types: [opened, synchronize, ready_for_review, reopened]
+
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+      id-token: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Claude Code Review
+        uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          track_progress: true
+          prompt: |
+            Review this pull request with focus on:
+
+            1. **Code Quality** - Clean code, error handling, readability
+            2. **Security** - Vulnerabilities, input validation, auth logic
+            3. **Testing** - Adequate coverage, edge cases, test quality
+            4. **Architecture** - Follows project patterns, proper separation of concerns
+
+            Reference CLAUDE.md for project-specific conventions.
+            Use inline comments for specific issues.
+            Use a top-level summary comment for overall assessment.
