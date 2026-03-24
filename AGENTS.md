@@ -4,7 +4,7 @@ This file provides guidance to AI coding agents when working with code in this r
 
 ## Workshop Context
 
-This is an exercise for the Agentic Engineering Workshop. The task is to implement feature flag filtering (see `TASK.md`).
+This is an exercise for the Agentic Engineering Workshop. The task is to create a reusable Claude Code skill that automates part of your workflow (see `TASK.md`).
 
 ### Branch Rules
 
