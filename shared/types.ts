@@ -41,6 +41,20 @@ export interface UpdateFlagInput {
   expiresAt?: string | null
 }
 
+export interface BulkToggleInput {
+  ids: string[]
+  enabled: boolean
+}
+
+export interface BulkToggleResult {
+  updated: number
+  flags: FeatureFlag[]
+}
+
+export interface BulkDeleteResult {
+  deleted: number
+}
+
 export interface ApiError {
   error: string
   message: string
