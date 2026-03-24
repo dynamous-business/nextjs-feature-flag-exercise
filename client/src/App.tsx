@@ -1,7 +1,8 @@
 import { useState } from 'react'
 import { QueryClient, QueryClientProvider, useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import type { FeatureFlag, CreateFlagInput, UpdateFlagInput } from '@shared/types'
+import type { FeatureFlag, CreateFlagInput, UpdateFlagInput, FlagFilters } from '@shared/types'
 import { getFlags, createFlag, updateFlag, deleteFlag } from '@/api/flags'
+import { FlagFiltersBar } from '@/components/flag-filters'
 import { FlagsTable } from '@/components/flags-table'
 import { FlagFormModal } from '@/components/flag-form-modal'
 import { DeleteConfirmDialog } from '@/components/delete-confirm-dialog'
@@ -15,10 +16,11 @@ function FlagsApp() {
   const [isFormOpen, setIsFormOpen] = useState(false)
   const [isDeleteOpen, setIsDeleteOpen] = useState(false)
   const [selectedFlag, setSelectedFlag] = useState<FeatureFlag | null>(null)
+  const [filters, setFilters] = useState<FlagFilters>({})
 
   const { data: flags = [], isLoading, error } = useQuery({
-    queryKey: ['flags'],
-    queryFn: getFlags,
+    queryKey: ['flags', filters],
+    queryFn: () => getFlags(filters),
   })
 
   const createMutation = useMutation({
@@ -111,6 +113,8 @@ function FlagsApp() {
             Create Flag
           </Button>
         </div>
+
+        <FlagFiltersBar filters={filters} onFiltersChange={setFilters} />
 
         {isLoading ? (
           <div className="text-center py-12 text-muted-foreground">Loading flags...</div>
