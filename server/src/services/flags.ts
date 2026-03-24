@@ -249,6 +249,52 @@ export async function updateFlag(id: string, input: UpdateFlagInput): Promise<Fe
   return flag
 }
 
+export async function bulkToggleFlags(ids: string[], enabled: boolean): Promise<FeatureFlag[]> {
+  const db = await getDb()
+  const now = new Date().toISOString()
+  const results: FeatureFlag[] = []
+
+  for (const id of ids) {
+    const existing = await getFlagById(id)
+    if (!existing) {
+      throw new NotFoundError(`Flag with id '${id}' not found`)
+    }
+
+    const stmt = db.prepare('UPDATE flags SET enabled = ?, updated_at = ? WHERE id = ?')
+    try {
+      stmt.run([enabled ? 1 : 0, now, id])
+    } finally {
+      stmt.free()
+    }
+
+    const updated = await getFlagById(id)
+    if (updated) {
+      results.push(updated)
+    }
+  }
+
+  saveDb()
+  return results
+}
+
+export async function bulkDeleteFlags(ids: string[]): Promise<number> {
+  const db = await getDb()
+  let deleted = 0
+
+  for (const id of ids) {
+    const stmt = db.prepare('DELETE FROM flags WHERE id = ?')
+    try {
+      stmt.run([id])
+      deleted++
+    } finally {
+      stmt.free()
+    }
+  }
+
+  saveDb()
+  return deleted
+}
+
 export async function deleteFlag(id: string): Promise<void> {
   const existing = await getFlagById(id)
   if (!existing) {
