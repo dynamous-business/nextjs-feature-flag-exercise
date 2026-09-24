@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from 'react'
+import { useState, useMemo } from 'react'
 import type { FeatureFlag, CreateFlagInput, Environment, FlagType } from '@shared/types'
 import {
   Dialog,
@@ -71,12 +71,21 @@ export function FlagFormModal({
   const [formData, setFormData] = useState<CreateFlagInput>(initialData)
   const [tagsInput, setTagsInput] = useState(initialTags)
 
-  useEffect(() => {
+  // Re-sync the form whenever the modal opens or the flag being edited changes.
+  // Adjusting state during render (not in an effect) avoids a cascading re-render:
+  // https://react.dev/learn/you-might-not-need-an-effect#adjusting-some-state-when-a-prop-changes
+  const [syncedWith, setSyncedWith] = useState({ open, initialData, initialTags })
+  if (
+    syncedWith.open !== open ||
+    syncedWith.initialData !== initialData ||
+    syncedWith.initialTags !== initialTags
+  ) {
+    setSyncedWith({ open, initialData, initialTags })
     if (open) {
       setFormData(initialData)
       setTagsInput(initialTags)
     }
-  }, [open, initialData, initialTags])
+  }
 
   const handleOpenChange = (newOpen: boolean) => {
     if (!newOpen) {

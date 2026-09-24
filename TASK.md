@@ -1,87 +1,89 @@
-# Exercise 3: Build a Skill
+# Exercise 3: Build a Skill, Then a Guarantee
 
-**As a developer**, I want to create a reusable Claude skill that automates part of my daily or weekly workflow, so I can trigger it by name and have Claude follow consistent, repeatable steps every time.
+**As a developer**, I want the process I keep repeating encoded in my AI Layer, so the agent runs it my way
+every time, and I want the one thing that must never slip enforced by a hook rather than asked for in a rule.
 
-## The Goal
-
-Create a reusable skill using the **3-tier progressive disclosure pattern** that automates something you actually do in your development workflow.
-
----
-
-## Your Task
-
-1. **Pick a workflow** you do regularly — something repetitive enough that a consistent process would save you time or reduce errors.
-
-2. **Create a skill file** at:
-   ```
-   .claude/skills/<your-skill-name>/SKILL.md
-   ```
-
-3. **Test it** — invoke your skill in Claude Code and verify it follows the steps you defined.
+Two parts, about 15-20 minutes each. Work in pairs for Part 1.
 
 ---
 
-## The 3-Tier Progressive Disclosure Pattern
+## Part 1: Build a skill
 
-Structure your skill so Claude loads only what it needs:
+A skill is a folder with a `SKILL.md` in it: a name, a description of **when** to use it, and the procedure the
+agent follows. The description is always loaded; the body loads only when the work matches. That's progressive
+disclosure, and it's why skills scale where a giant `CLAUDE.md` doesn't.
 
-**Tier 1 — YAML Frontmatter** (always loaded, keep it short)
-```yaml
----
-name: your-skill-name
-description: One sentence describing what this skill does
-triggers:
-  - "keyword or phrase that activates this skill"
-  - "/slash-command-style-trigger"
----
+**Pick one** (pair up and pick together):
+
+- **A. Build a new skill** for something you repeated today, or repeat every week. Rule of three: if you've
+  prompted it three times, bank it. Ideas: a changelog from recent commits, your team's PR description, a
+  "prep this ticket" checklist, a seed-data generator for this app, an API-docs update for a changed endpoint.
+- **B. Adapt a shipped one.** Make `piv-plan-implementation` *yours* by encoding what a good plan looks like on
+  your team (a "Planning conventions (always)" block), or have it fan out the `codebase-analyst` and
+  `research-agent` subagents **in parallel, in a single message** before it plans. Keep a baseline first:
+  `git add -A && git commit -m "before adapting the planner"`.
+
+**Don't write it by hand.** The meta-skill interviews you and builds it to the standard:
+
+```
+/skills-create <what you want the skill to do, or which shipped skill to adapt and why>
 ```
 
-**Tier 2 — SKILL.md Body** (the main instructions)
-- Step-by-step process Claude should follow
-- What inputs to expect, what outputs to produce
-- Validation steps and error handling
-- Examples of invocation
+It asks for input, process and output, writes `.claude/skills/<name>/SKILL.md` (plus `references/` when the
+body would get long), and validates it.
 
-**Tier 3 — Reference Subdirectory** (optional, for deeper context)
-```
-.claude/skills/<skill-name>/
-  SKILL.md          ← Tiers 1 & 2
-  reference/
-    checklist.md    ← Detailed checklists, templates, etc.
-    examples.md     ← Extended examples
-```
-Claude only loads reference files when they're explicitly needed, keeping context lean.
+**Then prove it:** start a fresh session and ask for the task in plain words, without naming the skill. Did it
+fire? Did it follow your process? If it didn't fire, the `description` is the problem: say *when* to use it,
+with the phrases you'd actually type.
 
----
+### Acceptance criteria
 
-## Skill Ideas
-
-Pick one that fits your workflow, or invent your own:
-
-- **Validation skill** — runs your project's specific test/lint/build pipeline and summarizes failures
-- **Code review skill** — applies your team's review checklist to a diff or PR
-- **Deployment skill** — walks through your CI/CD steps, checks environment variables, confirms readiness
-- **Jira/Linear skill** — queries open tickets, creates tasks, or updates ticket status from the terminal
-- **Changelog skill** — generates a formatted changelog from recent commits or merged PRs
-- **API docs skill** — scaffolds or updates documentation for a new endpoint based on code changes
-
-You can take inspiration from the skills in `.claude/skills/` (e.g., `agent-browser`, `pptx-generator`).
+- [ ] `.claude/skills/<name>/SKILL.md` exists, with `name` and a `description` that says what it does **and
+      when to use it**
+- [ ] The body is a procedure (inputs → steps → output), not an essay
+- [ ] Anything long or rarely needed lives in `references/`, with a one-line pointer from the body
+- [ ] In a fresh session it triggers from a plain-language request and produces the output you expected
 
 ---
 
-## Acceptance Criteria
+## Part 2: Build a guarantee (a hook)
 
-- [ ] A `SKILL.md` file exists at `.claude/skills/<skill-name>/SKILL.md`
-- [ ] The frontmatter includes `name`, `description`, and at least one `trigger`
-- [ ] The skill body clearly defines the process Claude should follow (steps, inputs, outputs)
-- [ ] You can invoke the skill in Claude Code and it performs the intended workflow
-- [ ] (Bonus) A `reference/` subdirectory with supporting context (checklist, template, or examples)
+A rule **asks** the agent to behave. A hook **guarantees** it: deterministic code that fires on a lifecycle
+event whether the model remembers or not. Pick one thing that must *always* hold, and describe it in plain
+English. Don't name an event or a file; choosing those is the skill's job.
+
+```
+/hooks-create Don't let the agent finish while the checks are red. When it tries to stop, run
+cd server && pnpm run build && pnpm run lint && pnpm test && cd ../client && pnpm run build && pnpm run lint
+and if anything fails, block the stop and tell it to fix the failures.
+```
+
+Or a protected path:
+
+```
+/hooks-create Never let the agent edit shared/types.ts without me. Block the edit and tell it to propose the
+type change to me first.
+```
+
+Expect permission prompts on `.claude/hooks/` and `.claude/settings.json`. Approve them: you're installing code
+that runs automatically. `.claude/hooks/README.md` has worked examples of all three shapes (react, gate, hand
+the baton), switched off.
+
+**Then prove it fires, both ways:** break the thing it guards (flip one assertion in
+`server/src/__tests__/flags.test.ts`, or ask the agent to edit the protected file) and watch it get blocked.
+Restore it and watch it pass.
+
+### Acceptance criteria
+
+- [ ] The hook is wired into `.claude/settings.json`, **merged** alongside anything already there
+- [ ] You saw it block when it should, and allow when it should
+- [ ] A Stop hook bounds its own retries, so it can't trap the agent forever
 
 ---
 
 ## Notes
 
-- The best skills are ones you'll actually use after today — pick something real.
-- Skills are just Markdown files. The "magic" is in writing clear instructions Claude can follow consistently.
-- Triggers act like slash commands — they tell Claude when to load and run the skill.
-- Keep Tier 1 (frontmatter) short. Put the detail in Tier 2 (body) or push it to Tier 3 (reference files).
+- The best skill is one you'll use tomorrow. Pick something real.
+- Skills and hooks are just files in `.claude/`. Commit them and your whole team inherits them.
+- The shipped skills in `.claude/skills/` are the house style to copy from. `skills-create` and `hooks-create`
+  are themselves skills.

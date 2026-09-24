@@ -1,0 +1,57 @@
+# Claude review: read-only. Runs the piv-review-pr skill against the PR and
+# posts the review as a PR comment. Claude reads code and comments; it never
+# writes to the branch (contents: read).
+#
+# Fires when a PR is opened or marked ready, and on demand when a trusted
+# contributor comments `@claude-review`. PRs from forks get no secrets, so
+# they never spend the key.
+name: Claude Review
+
+on:
+  pull_request:
+    types: [opened, ready_for_review]
+  issue_comment:
+    types: [created]
+
+jobs:
+  claude-review:
+    if: |
+      github.event_name == 'pull_request' || (
+        github.event_name == 'issue_comment'
+        && github.event.issue.pull_request
+        && contains(github.event.comment.body, '@claude-review')
+        && contains(fromJSON('["OWNER", "MEMBER", "COLLABORATOR"]'), github.event.comment.author_association)
+      )
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: read         # read-only: the reviewer never edits the branch
+      pull-requests: write   # post the review as a comment
+      issues: write
+      id-token: write
+      actions: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Run Claude code review
+        uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          trigger_phrase: "@claude-review"
+          track_progress: true
+          prompt: |
+            Review pull request #${{ github.event.pull_request.number || github.event.issue.number }}
+            by following the piv-review-pr skill in .claude/skills/piv-review-pr/SKILL.md.
+
+            Review the full diff against the base branch: correctness, security, error handling,
+            test coverage, and compliance with CLAUDE.md. Hand the deep pass to the code-reviewer
+            subagent in .claude/agents/ if you can. Skip running the dev servers.
+
+            Post the review as a single PR comment, severity-ranked, citing file:line for every
+            finding. Do not modify any files and do not approve or merge: this is a read-only review.
+          claude_args: |
+            --max-turns 30
