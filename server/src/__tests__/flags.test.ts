@@ -134,6 +134,22 @@ describe('Flag Service', () => {
         tags: [],
       })).rejects.toThrow('already exists')
     })
+
+    // Regression: issue #7, a flag could be created already expired
+    it('rejects an expiresAt in the past', async () => {
+      await expect(createFlag({ ...validFlagInput, expiresAt: '2020-01-01T00:00:00Z' }))
+        .rejects.toThrow('expiresAt: must be in the future')
+      expect(await getAllFlags()).toEqual([])
+    })
+
+    it('accepts an expiresAt in the future or null', async () => {
+      const future = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
+      const flag = await createFlag({ ...validFlagInput, expiresAt: future })
+      expect(flag.expiresAt).toBe(future)
+
+      const noExpiry = await createFlag({ ...validFlagInput, name: 'no-expiry', expiresAt: null })
+      expect(noExpiry.expiresAt).toBeNull()
+    })
   })
 
   describe('getFlagById', () => {
@@ -260,6 +276,27 @@ describe('Flag Service', () => {
 
       await expect(updateFlag(second.id, { name: 'existing-flag' }))
         .rejects.toThrow('already exists')
+    })
+
+    // Regression: issue #7, updating to an expiry in the past must be rejected
+    it('rejects updating expiresAt to a past date', async () => {
+      const created = await createFlag(validFlagInput)
+
+      await expect(updateFlag(created.id, { expiresAt: '2020-01-01T00:00:00Z' }))
+        .rejects.toThrow('expiresAt: must be in the future')
+      expect((await getFlagById(created.id))?.expiresAt).toBeNull()
+    })
+
+    it('still allows editing a flag that has already expired', async () => {
+      const past = '2020-01-01T00:00:00.000Z'
+      const created = await createFlag(validFlagInput)
+      // Simulate a flag whose expiry has lapsed since it was created
+      db.run('UPDATE flags SET expires_at = ? WHERE id = ?', [past, created.id])
+
+      // The edit form resends the unchanged expiresAt alongside other fields
+      const updated = await updateFlag(created.id, { description: 'Edited', expiresAt: past })
+      expect(updated.description).toBe('Edited')
+      expect(updated.expiresAt).toBe(past)
     })
   })
 

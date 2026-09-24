@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from 'uuid'
 import { getDb, saveDb } from '../db/client.js'
-import { NotFoundError, ConflictError } from '../middleware/error.js'
+import { NotFoundError, ConflictError, ValidationError } from '../middleware/error.js'
 import type { FeatureFlag, CreateFlagInput, UpdateFlagInput, Environment, FlagType } from '../../../shared/types.js'
 
 const VALID_ENVIRONMENTS: Environment[] = ['development', 'staging', 'production']
@@ -12,6 +12,12 @@ function isEnvironment(value: unknown): value is Environment {
 
 function isFlagType(value: unknown): value is FlagType {
   return typeof value === 'string' && VALID_FLAG_TYPES.includes(value as FlagType)
+}
+
+function assertExpiryInFuture(expiresAt: string | null | undefined): void {
+  if (expiresAt && new Date(expiresAt).getTime() <= Date.now()) {
+    throw new ValidationError('expiresAt: must be in the future')
+  }
 }
 
 interface DbRow {
@@ -126,6 +132,8 @@ export async function getFlagByName(name: string): Promise<FeatureFlag | null> {
 }
 
 export async function createFlag(input: CreateFlagInput): Promise<FeatureFlag> {
+  assertExpiryInFuture(input.expiresAt)
+
   const existing = await getFlagByName(input.name)
   if (existing) {
     throw new ConflictError(`Flag with name '${input.name}' already exists`)
@@ -174,6 +182,11 @@ export async function updateFlag(id: string, input: UpdateFlagInput): Promise<Fe
   const existing = await getFlagById(id)
   if (!existing) {
     throw new NotFoundError(`Flag with id '${id}' not found`)
+  }
+
+  // Only a changed expiry is checked, so an already-expired flag can still be edited
+  if (input.expiresAt !== existing.expiresAt) {
+    assertExpiryInFuture(input.expiresAt)
   }
 
   // Check for name conflict if name is being changed
