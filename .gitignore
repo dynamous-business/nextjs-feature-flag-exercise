@@ -1,15 +1,8 @@
-# Exercise files (tracked on exercise branches, not main)
-client/
-server/
-
 # Dependencies
 node_modules/
 
 # Build output
 dist/
-
-# Database
-*.db
 
 # Environment
 .env
@@ -27,5 +20,10 @@ dist/
 
 # Logs
 *.log
+logs/
 
-# Claude Code
+# Claude Code: per-person settings and hook runtime state (the AI Layer itself is committed)
+.claude/settings.local.json
+.claude/hooks/.gate-state/
+.claude/hooks/.react-log/
+docs/issues/.baton-*

@@ -1,33 +1,77 @@
-# Agentic Engineering Workshop
+# Feature Flag Manager: Agentic Engineering Exercise
 
-Exercise repository for the Agentic Engineering Workshop.
+A small feature flag dashboard with a React frontend and an Express backend. You can create, edit, toggle and
+delete flags across environments, with flag types, owners, tags and rollout percentages. It is the hands-on
+project for the Agentic Engineering masterclass: small enough to understand in minutes, real enough that an
+agent can get it wrong.
 
-## Exercises
+The ticket is in [TASK.md](./TASK.md).
 
-| Branch | Description |
-|--------|-------------|
-| `exercise-1` | Baseline - establish your current AI-assisted coding workflow |
-| `exercise-2` | Command-Driven Development - same task with pre-configured helper commands |
-| `exercise-3` | Group exercise - identify team workflows to automate as commands |
+## The branches
 
-### Exercise 1: Baseline
+| Branch | What it is | Used for |
+|---|---|---|
+| `main` | The app **with the full AI Layer** in `.claude/` (the same as `exercise-2`) | Start here to explore the AI Layer, or to run the loop on a ticket of your own |
+| `exercise-1` | The app with project docs only. **No AI Layer.** | Exercise 1, the baseline: build the ticket with your current process |
+| `exercise-2` | The same app **with the AI Layer installed** in `.claude/` (skills, subagents, references, hook templates) | Exercise 2: the *same* ticket, run through the R-PIV loop |
+| `exercise-3` | The same as `exercise-2`, with a different `TASK.md` | Exercise 3: build a skill, then a hook |
 
-Use your AI coding assistant as you normally would, without any learnings from the workshop. This establishes your baseline workflow. Solve the task however you wish.
+The application code is identical on every branch. The only differences are the AI Layer (absent on
+`exercise-1`) and the task (`exercise-3` has its own). The AI Layer is the same one published in
+[dynamous-business/goto-copenhagen-masterclass-resources](https://github.com/dynamous-business/goto-copenhagen-masterclass-resources).
 
-### Exercise 2: Command-Driven Development
+## Prerequisites
 
-Same task as Exercise 1, but now with pre-configured helper commands in `.claude/commands/`. You're encouraged to explore and even improve the commands before solving the task. Learn the pattern of using reusable commands for Planning, Implementing, and Validating.
+- Node.js 20+ and [pnpm](https://pnpm.io/installation) (`npm install -g pnpm`)
+- Git, and a GitHub account
+- [Claude Code](https://code.claude.com), logged in on a paid plan (Max is ideal for a full day; Pro may hit its
+  usage limit in the afternoon; an Anthropic API key also works)
+- Optional: [uv](https://docs.astral.sh/uv/) (the shipped hook templates run with it) and
+  [agent-browser](https://github.com/vercel-labs/agent-browser) (`npm install -g agent-browser && agent-browser install`)
+  so the agent can test the UI like a user
 
-### Exercise 3: Workflow Automation (Group)
-
-No coding in this exercise. In your group, discuss workflows and repetitive tasks that could be automated through commands. Identify patterns from your own work that would benefit from reusable prompts.
-
-## Getting Started
-
-To work on an exercise, checkout the corresponding branch:
+## Quick start
 
 ```bash
-git checkout exercise-1
+git clone https://github.com/dynamous-business/nextjs-feature-flag-exercise
+cd nextjs-feature-flag-exercise
+git switch exercise-1                  # the masterclass starts here
+
+cd server && pnpm install && cd ../client && pnpm install && cd ..
 ```
 
-Each exercise branch contains a `TASK.md` with detailed instructions.
+Then in two terminals:
+
+```bash
+cd server && pnpm dev    # API on http://localhost:3001
+```
+
+```bash
+cd client && pnpm dev    # app on http://localhost:3000
+```
+
+The server seeds sample flags into `server/flags.db` on first run. Delete that file to reset the data.
+
+## Moving between exercises
+
+Keep each attempt on its own branch so you can compare them afterwards:
+
+```bash
+git switch -c my-baseline                 # before Exercise 1, from exercise-1
+git add -A && git commit -m "baseline"    # when you're done
+
+git switch exercise-2                      # the AI Layer appears in .claude/
+git switch -c my-rpiv                      # Exercise 2 happens here
+```
+
+Run `pnpm install` again in `server/` and `client/` after switching if dependencies changed. They don't between
+these three branches.
+
+## Validation
+
+```bash
+cd server && pnpm run build && pnpm run lint && pnpm test
+cd ../client && pnpm run build && pnpm run lint
+```
+
+All of these pass on a fresh clone of every branch.
