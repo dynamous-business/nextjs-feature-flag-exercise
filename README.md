@@ -54,18 +54,17 @@ The server seeds sample flags into `server/flags.db` on first run. Delete that f
 
 ## Moving between exercises
 
-Keep each attempt on its own branch so you can compare them afterwards:
+Commit before every switch, so nothing carries from one exercise into the next:
 
 ```bash
-git switch -c my-baseline                 # before Exercise 1, from exercise-1
-git add -A && git commit -m "baseline"    # when you're done
-
-git switch exercise-2                      # the AI Layer appears in .claude/
-git switch -c my-rpiv                      # Exercise 2 happens here
+git switch exercise-1                                                  # Exercise 1 (baseline)
+git add -A && git commit -m "baseline" && git switch exercise-2        # the AI Layer appears in .claude/
+git switch -c my-rpiv                                                  # Exercise 2 happens here
+git add -A && git commit -m "r-piv" && git switch exercise-3           # Exercise 3
+git add -A && git commit -m "skill + hook" && git switch my-rpiv       # Exercise 4
 ```
 
-Run `pnpm install` again in `server/` and `client/` after switching if dependencies changed. They don't between
-these three branches.
+Dependencies are identical on every branch, so there's no need to reinstall after switching.
 
 ## Validation
 
