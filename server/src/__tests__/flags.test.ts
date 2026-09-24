@@ -10,6 +10,7 @@ import {
   updateFlag,
   deleteFlag,
 } from '../services/flags.js'
+import { createFlagSchema, updateFlagSchema } from '../middleware/validation.js'
 import type { CreateFlagInput } from '../../../shared/types.js'
 
 let db: Database
@@ -286,5 +287,24 @@ describe('Flag Service', () => {
       await expect(deleteFlag('non-existent-id'))
         .rejects.toThrow('not found')
     })
+  })
+})
+
+describe('Flag validation', () => {
+  // Regression for #4: whitespace-only owner/description were accepted
+  it.each(['owner', 'description'] as const)('rejects whitespace-only %s on create', (field) => {
+    const result = createFlagSchema.safeParse({ ...validFlagInput, [field]: '   ' })
+    expect(result.success).toBe(false)
+  })
+
+  it.each(['owner', 'description'] as const)('rejects whitespace-only %s on update', (field) => {
+    const result = updateFlagSchema.safeParse({ [field]: '   ' })
+    expect(result.success).toBe(false)
+  })
+
+  it('trims surrounding whitespace from owner and description', () => {
+    const result = createFlagSchema.parse({ ...validFlagInput, owner: '  team-a  ', description: ' Desc ' })
+    expect(result.owner).toBe('team-a')
+    expect(result.description).toBe('Desc')
   })
 })
