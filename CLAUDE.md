@@ -85,7 +85,7 @@ reference guides (`.claude/references/`) and hook templates (`.claude/hooks/`, o
 `/prime-codebase`, `/piv-plan-implementation`, `/piv-implement`, `/piv-validate`, `/piv-review-changes`,
 `/piv-commit`, `/piv-create-pr`.
 
-- Plans go in `.claude/plans/`, execution reports in `.claude/reports/`. Commit the plan before implementing,
+- Plans go in `.claude/plans/`, execution reports in `.claude/reports/`, reviews in `.claude/code-reviews/`. Commit the plan before implementing,
   so it's a rollback point.
 - Implement in a **fresh session** that gets only the plan path. Review in another fresh session: the agent
   doesn't grade its own homework.
