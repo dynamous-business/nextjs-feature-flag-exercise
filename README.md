@@ -66,6 +66,9 @@ git add -A && git commit -m "skill + hook" && git switch my-rpiv       # Exercis
 
 Dependencies are identical on every branch, so there's no need to reinstall after switching.
 
+Stop your Exercise 1 dev servers before Exercise 2: the app always runs on ports 3000 and 3001. After switching to
+`exercise-2`, start a new Claude Code session so it loads the AI Layer.
+
 ## Validation
 
 ```bash
