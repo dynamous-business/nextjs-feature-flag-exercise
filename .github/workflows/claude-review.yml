@@ -45,13 +45,17 @@ jobs:
           track_progress: true
           prompt: |
             Review pull request #${{ github.event.pull_request.number || github.event.issue.number }}
-            by following the piv-review-pr skill in .claude/skills/piv-review-pr/SKILL.md.
+            against its base branch, using the review bar in .claude/skills/piv-review-pr/SKILL.md
+            and the conventions in CLAUDE.md.
 
-            Review the full diff against the base branch: correctness, security, error handling,
-            test coverage, and compliance with CLAUDE.md. Hand the deep pass to the code-reviewer
-            subagent in .claude/agents/ if you can. Skip running the dev servers.
+            Do the whole review yourself, in this session: do not launch subagents or background
+            tasks, and do not install dependencies or run the test suite (this job only reviews).
+            Read the diff with `gh pr diff`, then read the files it touches.
 
-            Post the review as a single PR comment, severity-ranked, citing file:line for every
-            finding. Do not modify any files and do not approve or merge: this is a read-only review.
+            Check correctness, edge cases, security, error handling, test coverage, and CLAUDE.md
+            compliance. Post ONE comment: a verdict line, then findings worst-first, each marked
+            BLOCKER, SHOULD-FIX or NIT, each citing file:line. Do not modify any files and do not
+            approve or merge.
           claude_args: |
-            --max-turns 30
+            --max-turns 40
+            --allowedTools "Read,Grep,Glob,Bash(gh pr diff:*),Bash(gh pr view:*),Bash(git diff:*),Bash(git log:*),Bash(git show:*)"
