@@ -14,7 +14,7 @@ The ticket is in [TASK.md](./TASK.md).
 | `main` | The app **with the full AI Layer** in `.claude/` (the same as `exercise-2`) | Start here to explore the AI Layer, or to run the loop on a ticket of your own |
 | `exercise-1` | The app with project docs only. **No AI Layer.** | Exercise 1, the baseline: build the ticket with your current process |
 | `exercise-2` | The same app **with the AI Layer installed** in `.claude/` (skills, subagents, references, hook templates) | Exercise 2: the *same* ticket, run through the R-PIV loop |
-| `exercise-3` | The same as `exercise-2`, with a different `TASK.md` | Exercise 3: build your own debugging skill |
+| `exercise-3` | The same as `exercise-2`, with a different `TASK.md` | Exercise 3: build a skill |
 
 The application code is identical on every branch. The only differences are the AI Layer (absent on
 `exercise-1`) and the task (`exercise-3` has its own). The AI Layer is the same one published in
