@@ -27,3 +27,7 @@ logs/
 .claude/hooks/.gate-state/
 .claude/hooks/.react-log/
 docs/issues/.baton-*
+
+# Git worktrees made by /worktree-create and /skills-create (never commit them as embedded repos)
+/worktrees/
+.claude/worktrees/
