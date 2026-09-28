@@ -47,12 +47,6 @@ with the phrases you'd actually type.
 
 ---
 
-## Stretch (fast finishers)
-
-Add a guarantee with `/hooks-create`, e.g. *"don't let the agent finish while the checks are red"*. A rule
-**asks** the agent to behave; a hook **guarantees** it. Hooks ship switched off: `.claude/hooks/README.md` has
-worked examples.
-
 ## Notes
 
 - The best skill is one you'll use tomorrow. Pick something real.
