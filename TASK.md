@@ -1,89 +1,71 @@
-# Exercise 3: Build a Skill, Then a Guarantee
+# Exercise 3: Build Your Debugging Skill
 
-**As a developer**, I want the process I keep repeating encoded in my AI Layer, so the agent runs it my way
-every time, and I want the one thing that must never slip enforced by a hook rather than asked for in a rule.
+**As a developer**, I want the way I debug encoded in my AI Layer, so that when I hand the agent a bug it
+diagnoses before it fixes, every time, instead of guessing at a patch.
 
-Two parts, about 15-20 minutes each. Work in pairs for Part 1.
+About 25 minutes. Work in pairs if you like.
 
 ---
 
-## Part 1: Build a skill
+## Why a debugging skill
 
-A skill is a folder with a `SKILL.md` in it: a name, a description of **when** to use it, and the procedure the
-agent follows. The description is always loaded; the body loads only when the work matches. That's progressive
-disclosure, and it's why skills scale where a giant `CLAUDE.md` doesn't.
+The most expensive agent habit is **fixing before understanding**: it sees a symptom, edits the nearest
+plausible line, and the tests go green for the wrong reason. The workflow on the slides is the cure:
 
-**Pick one** (pair up and pick together):
+1. **Reproduce.** A failing test or a reliable repro *before* anything changes.
+2. **Locate.** A named root cause with evidence (the file, the line, why), not a guess.
+3. **Fix.** One cause, one change, with the failing test as the acceptance check.
+4. **Prevent.** Encode the lesson (a rule, a skill step, a test) so this class of bug can't come back.
 
-- **A. Build a new skill** for something you repeated today, or repeat every week. Rule of three: if you've
-  prompted it three times, bank it. Ideas: a changelog from recent commits, your team's PR description, a
-  "prep this ticket" checklist, a seed-data generator for this app, an API-docs update for a changed endpoint.
-- **B. Adapt a shipped one.** Make `piv-plan-implementation` *yours* by encoding what a good plan looks like on
-  your team (a "Planning conventions (always)" block), or have it fan out the `codebase-analyst` and
-  `research-agent` subagents **in parallel, in a single message** before it plans. Keep a baseline first:
-  `git add -A && git commit -m "before adapting the planner"`.
+You'll turn that into a skill, so it runs the same way whether you remember to ask for it or not.
+
+A skill is a folder with a `SKILL.md`: a name, a description of **when** to use it, and the procedure the
+agent follows. The description is always loaded; the body loads only when the work matches (progressive
+disclosure).
+
+---
+
+## Build it
 
 **Don't write it by hand.** The meta-skill interviews you and builds it to the standard:
 
 ```
-/skills-create <what you want the skill to do, or which shipped skill to adapt and why>
+/skills-create A debugging skill: given a bug report in plain words, reproduce it first (a failing test or a
+repro), find the root cause with evidence before changing any code, make one fix that turns the failing test
+green, then say what rule, skill step or test would stop this class of bug coming back.
 ```
 
-It asks for input, process and output, writes `.claude/skills/<name>/SKILL.md` (plus `references/` when the
-body would get long), and validates it.
+Make it **yours**: what counts as a repro on your team, how deep the root-cause digging goes, what it hands
+back. Keep it **local**: it works from the bug you describe, and it doesn't post to GitHub.
 
-**Then prove it:** start a fresh session and ask for the task in plain words, without naming the skill. Did it
-fire? Did it follow your process? If it didn't fire, the `description` is the problem: say *when* to use it,
-with the phrases you'd actually type.
+## Prove it on a real bug
 
-### Acceptance criteria
+Start a **fresh session** and describe the bug in plain words, **without naming the skill**:
+
+> The app lets me create a flag with an expiry date that has already passed. Figure out why.
+
+(It's a real bug in this app.) Did the skill fire? Did it reproduce and name the root cause **before** it
+touched any code? If it didn't fire, the `description` is the problem: say *when* to use it, with the phrases
+you'd actually type ("bug", "broken", "figure out why", "not working").
+
+---
+
+## Acceptance criteria
 
 - [ ] `.claude/skills/<name>/SKILL.md` exists, with `name` and a `description` that says what it does **and
       when to use it**
-- [ ] The body is a procedure (inputs → steps → output), not an essay
-- [ ] Anything long or rarely needed lives in `references/`, with a one-line pointer from the body
-- [ ] In a fresh session it triggers from a plain-language request and produces the output you expected
+- [ ] The body is a procedure (reproduce → locate → fix → prevent), not an essay
+- [ ] In a fresh session it triggers from a plain-language bug report
+- [ ] It names the root cause, with evidence, **before** editing code
+- [ ] The fix comes with a test that failed before and passes after
 
----
+## Stretch (fast finishers)
 
-## Part 2: Build a guarantee (a hook)
-
-A rule **asks** the agent to behave. A hook **guarantees** it: deterministic code that fires on a lifecycle
-event whether the model remembers or not. Pick one thing that must *always* hold, and describe it in plain
-English. Don't name an event or a file; choosing those is the skill's job.
-
-```
-/hooks-create Don't let the agent finish while the checks are red. When it tries to stop, run
-cd server && pnpm run build && pnpm run lint && pnpm test && cd ../client && pnpm run build && pnpm run lint
-and if anything fails, block the stop and tell it to fix the failures.
-```
-
-Or a protected path:
-
-```
-/hooks-create Never let the agent edit shared/types.ts without me. Block the edit and tell it to propose the
-type change to me first.
-```
-
-Expect permission prompts on `.claude/hooks/` and `.claude/settings.json`. Approve them: you're installing code
-that runs automatically. `.claude/hooks/README.md` has worked examples of all three shapes (react, gate, hand
-the baton), switched off.
-
-**Then prove it fires, both ways:** break the thing it guards (flip one assertion in
-`server/src/__tests__/flags.test.ts`, or ask the agent to edit the protected file) and watch it get blocked.
-Restore it and watch it pass.
-
-### Acceptance criteria
-
-- [ ] The hook is wired into `.claude/settings.json`, **merged** alongside anything already there
-- [ ] You saw it block when it should, and allow when it should
-- [ ] A Stop hook bounds its own retries, so it can't trap the agent forever
-
----
+- Compare yours with the shipped one: `.claude/skills/piv-investigate-issue/SKILL.md` (you'll see it demoed next).
+- Add a guarantee with `/hooks-create`, e.g. *"don't let the agent finish while the checks are red"*. Hooks ship
+  switched off; `.claude/hooks/README.md` has worked examples.
 
 ## Notes
 
-- The best skill is one you'll use tomorrow. Pick something real.
-- Skills and hooks are just files in `.claude/`. Commit them and your whole team inherits them.
-- The shipped skills in `.claude/skills/` are the house style to copy from. `skills-create` and `hooks-create`
-  are themselves skills.
+- Skills are just files in `.claude/`. Commit yours and your whole team inherits the way you debug.
+- The shipped skills in `.claude/skills/` are the house style to copy from. `skills-create` is itself a skill.
