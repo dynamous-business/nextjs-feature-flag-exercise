@@ -1,4 +1,4 @@
-import type { FeatureFlag, CreateFlagInput, UpdateFlagInput, ApiError } from '@shared/types'
+import type { FeatureFlag, CreateFlagInput, UpdateFlagInput, FlagFilters, ApiError } from '@shared/types'
 
 const API_BASE = 'http://localhost:3001/api'
 
@@ -32,9 +32,18 @@ async function handleResponse<T>(response: Response): Promise<T> {
   }
 }
 
-export async function getFlags(): Promise<FeatureFlag[]> {
+export async function getFlags(filters?: FlagFilters): Promise<FeatureFlag[]> {
   try {
-    const response = await fetch(`${API_BASE}/flags`)
+    const params = new URLSearchParams()
+    if (filters?.environment) params.set('environment', filters.environment)
+    if (filters?.enabled !== undefined) params.set('enabled', String(filters.enabled))
+    if (filters?.type) params.set('type', filters.type)
+    if (filters?.owner) params.set('owner', filters.owner)
+    if (filters?.name) params.set('name', filters.name)
+
+    const query = params.toString()
+    const url = `${API_BASE}/flags${query ? `?${query}` : ''}`
+    const response = await fetch(url)
     return handleResponse<FeatureFlag[]>(response)
   } catch (e) {
     if (e instanceof TypeError) {

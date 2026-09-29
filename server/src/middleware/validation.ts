@@ -13,3 +13,11 @@ export const createFlagSchema = z.object({
 })
 
 export const updateFlagSchema = createFlagSchema.partial()
+
+export const flagFiltersSchema = z.object({
+  environment: z.enum(['development', 'staging', 'production']).optional(),
+  enabled: z.enum(['true', 'false']).transform(v => v === 'true').optional(),
+  type: z.enum(['release', 'experiment', 'operational', 'permission']).optional(),
+  owner: z.string().optional(),
+  name: z.string().optional(),
+})
