@@ -1,4 +1,4 @@
-import type { FeatureFlag, CreateFlagInput, UpdateFlagInput, ApiError } from '@shared/types'
+import type { FeatureFlag, CreateFlagInput, UpdateFlagInput, BulkToggleInput, BulkToggleResult, BulkDeleteResult, ApiError } from '@shared/types'
 
 const API_BASE = 'http://localhost:3001/api'
 
@@ -94,6 +94,38 @@ export async function deleteFlag(id: string): Promise<void> {
       method: 'DELETE',
     })
     await handleResponse<void>(response)
+  } catch (e) {
+    if (e instanceof TypeError) {
+      throw new Error('Unable to connect to server. Please check your connection.')
+    }
+    throw e
+  }
+}
+
+export async function bulkToggleFlags(input: BulkToggleInput): Promise<BulkToggleResult> {
+  try {
+    const response = await fetch(`${API_BASE}/flags/bulk-toggle`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(input),
+    })
+    return handleResponse<BulkToggleResult>(response)
+  } catch (e) {
+    if (e instanceof TypeError) {
+      throw new Error('Unable to connect to server. Please check your connection.')
+    }
+    throw e
+  }
+}
+
+export async function bulkDeleteFlags(ids: string[]): Promise<BulkDeleteResult> {
+  try {
+    const response = await fetch(`${API_BASE}/flags/bulk-delete`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ids }),
+    })
+    return handleResponse<BulkDeleteResult>(response)
   } catch (e) {
     if (e instanceof TypeError) {
       throw new Error('Unable to connect to server. Please check your connection.')

@@ -13,3 +13,12 @@ export const createFlagSchema = z.object({
 })
 
 export const updateFlagSchema = createFlagSchema.partial()
+
+export const bulkToggleSchema = z.object({
+  ids: z.array(z.string().uuid()).min(1, 'At least one flag ID is required'),
+  enabled: z.boolean(),
+})
+
+export const bulkDeleteSchema = z.object({
+  ids: z.array(z.string().uuid()).min(1, 'At least one flag ID is required'),
+})

@@ -1,6 +1,6 @@
 import { Router } from 'express'
-import { getAllFlags, getFlagById, createFlag, updateFlag, deleteFlag } from '../services/flags.js'
-import { createFlagSchema, updateFlagSchema } from '../middleware/validation.js'
+import { getAllFlags, getFlagById, createFlag, updateFlag, deleteFlag, bulkToggleFlags, bulkDeleteFlags } from '../services/flags.js'
+import { createFlagSchema, updateFlagSchema, bulkToggleSchema, bulkDeleteSchema } from '../middleware/validation.js'
 import { NotFoundError } from '../middleware/error.js'
 
 export const flagsRouter = Router()
@@ -57,6 +57,28 @@ flagsRouter.delete('/:id', async (req, res, next) => {
   try {
     await deleteFlag(req.params.id)
     res.json({ success: true })
+  } catch (error) {
+    next(error)
+  }
+})
+
+// POST /api/flags/bulk-toggle - Toggle multiple flags at once
+flagsRouter.post('/bulk-toggle', async (req, res, next) => {
+  try {
+    const { ids, enabled } = bulkToggleSchema.parse(req.body)
+    const flags = await bulkToggleFlags(ids, enabled)
+    res.json({ updated: flags.length, flags })
+  } catch (error) {
+    next(error)
+  }
+})
+
+// POST /api/flags/bulk-delete - Delete multiple flags at once
+flagsRouter.post('/bulk-delete', async (req, res, next) => {
+  try {
+    const { ids } = bulkDeleteSchema.parse(req.body)
+    const count = await bulkDeleteFlags(ids)
+    res.json({ deleted: count })
   } catch (error) {
     next(error)
   }
