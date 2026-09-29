@@ -61,6 +61,9 @@ For EACH task in "Step by Step Tasks":
 - **Run the task's own `VALIDATE` command before starting the next task.** Every task in the plan carries one.
   A task is not done until its check passes — if it fails, fix it now rather than carrying the failure forward.
   The full suite still runs at step 4; this is the per-task gate that keeps step 4 from becoming a pile-up.
+  If a check cannot pass until a later task (a caller the plan updates later), don't reorder the plan and don't
+  skip silently: note the task, the failure, and the task that turns it green, and list it under the report's
+  "Deviations from the plan".
 
 ### 3. Implement Testing Strategy
 

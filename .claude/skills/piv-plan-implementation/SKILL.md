@@ -476,6 +476,9 @@ Execute every command to ensure zero regressions and 100% feature correctness.
 - [ ] Another developer could execute without additional context
 - [ ] Tasks ordered by dependency (can execute top-to-bottom)
 - [ ] Each task is atomic and independently testable
+- [ ] Call-site check: for every task that changes an exported signature, grep its callers. Either the same
+      task updates them, or that task's VALIDATE is narrowed to what can pass then and says
+      "full build green after task N"
 - [ ] Pattern references include specific file:line numbers
 
 ### Pattern Consistency ✓
